@@ -17,6 +17,7 @@ import Reports from './pages/Reports.jsx'
 import Settings from './pages/Settings.jsx'
 import NotFound from './pages/NotFound.jsx'
 import OfflineNotice from './components/OfflineNotice.jsx'
+import LicenseGate from './components/LicenseGate.jsx'
 
 function Protected({ children }) {
   const { user, loading } = useAuth()
@@ -32,7 +33,8 @@ function App() {
   return (
     <>
       <OfflineNotice />
-      <Routes>
+      <LicenseGate>
+        <Routes>
       <Route path="/login" element={<Login />} />
       <Route
         path="/"
@@ -55,7 +57,8 @@ function App() {
         <Route path="settings" element={<Settings />} />
         <Route path="*" element={<NotFound />} />
       </Route>
-    </Routes>
+      </Routes>
+      </LicenseGate>
     </>
   )
 }

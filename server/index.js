@@ -13,7 +13,9 @@ import saleRoutes from './routes/sales.js';
 import purchaseRoutes from './routes/purchases.js';
 import employeeRoutes from './routes/employees.js';
 import reportRoutes from './routes/reports.js';
+import licenseRoutes from './routes/license.js';
 import db from './db.js';
+import { checkLicense } from './license.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -65,6 +67,18 @@ app.put('/api/settings', (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
+});
+
+app.use('/api/license', licenseRoutes);
+
+const PUBLIC_API = ['/api/health', '/api/network', '/api/auth/login', '/api/settings'];
+app.use('/api', (req, res, next) => {
+  const fullPath = req.originalUrl.split('?')[0];
+  if (fullPath.startsWith('/api/license')) return next();
+  if (req.method === 'GET' && PUBLIC_API.includes(fullPath)) return next();
+  const lic = checkLicense();
+  if (!lic.valid) return res.status(402).json({ error: 'license_required', license: lic });
+  next();
 });
 
 app.use('/api/auth', authRoutes);
