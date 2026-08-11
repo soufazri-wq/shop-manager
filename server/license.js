@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import db from './db.js';
 
-const TRIAL_DAYS = Math.max(1, parseInt(process.env.TRIAL_DAYS || '14', 10));
+const TRIAL_DAYS = Math.max(0, parseInt(process.env.TRIAL_DAYS || '14', 10));
 
 export const PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
 MCowBQYDK2VwAyEACKFabnj16kI5I0m9Z7qY0hc6PBRBT9ZiQBzUJ3LKxhQ=
@@ -108,8 +108,8 @@ export function checkLicense() {
       return { valid: true, activated: true, trial: false, installId: id, expiry: v.expiry, message: 'activated' };
     }
   }
-  const trialEnds = addDaysStr(at, TRIAL_DAYS);
-  const valid = todayStr() <= trialEnds;
+  const trialEnds = TRIAL_DAYS > 0 ? addDaysStr(at, TRIAL_DAYS) : at;
+  const valid = TRIAL_DAYS > 0 && todayStr() <= trialEnds;
   const daysLeft = Math.max(0, Math.floor((new Date(trialEnds + 'T00:00:00Z') - new Date()) / 86400000) + 1);
   return {
     valid, activated: false, trial: true,
