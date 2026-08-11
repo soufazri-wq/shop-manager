@@ -303,21 +303,10 @@ export default function POS() {
 
           {/* 2. Info bar */}
           <div className="pos-infobar">
-            <div className="pos-infobuttons">
-              <button className="pos-infobtn" title="العميل" onClick={() => setCustomerOpen(true)}>🪪</button>
-              <button className="pos-infobtn" title="المستخدم">{'👤'}</button>
-              <button className="pos-infobtn" title="المفضلة">{'❤️'}</button>
-            </div>
             <div className="pos-sale-info">
               <div className="pos-info-item">
                 <span className="pos-info-label">رقم البيع</span>
                 <span className="pos-info-value fa-no">{invoiceNo}</span>
-              </div>
-              <div className="pos-info-item">
-                <span className="pos-info-label">تاريخ البيع</span>
-                <span className="pos-info-value date">
-                  {toLatin(now.toLocaleDateString('ar-EG'))} — {toLatin(now.toLocaleTimeString('ar-EG'))}
-                </span>
               </div>
             </div>
             <div className={`pos-display ${items.length ? 'pos-display-total' : ''}`}>{displayText}</div>
@@ -339,6 +328,7 @@ export default function POS() {
             <button className="pos-tool-btn" title="تصدير" onClick={exportCart}>📤</button>
             <button className="pos-tool-btn" title="إضافة إلى السلة" onClick={() => searchRef.current && searchRef.current.focus()}>🛒</button>
             <button className="pos-tool-btn box" title="المنتجات" onClick={() => setShowCats((v) => !v)}>📦</button>
+            <button className="pos-tool-btn customer" title="العميل" onClick={() => setCustomerOpen(true)}>🪪</button>
           </div>
 
           {/* 4. Search bar */}

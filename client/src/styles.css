@@ -1369,12 +1369,6 @@ html[dir='ltr'] .search-box .search-icon {
   height: 96px;
   min-height: 96px;
 }
-.pos-infobuttons { display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 8px 6px; background: #0b0b0f; }
-.pos-infobtn {
-  width: 42px; height: 30px; background: #1f2937; border: 1px solid #374151;
-  border-radius: 6px; color: #fff; cursor: pointer; font-size: 19px; line-height: 1;
-}
-.pos-infobtn:hover { background: #374151; }
 .pos-sale-info {
   display: flex; flex-direction: column; justify-content: center; gap: 6px;
   padding: 10px 14px; min-width: 200px; border-inline-end: 1px solid #1f2937;
@@ -1383,7 +1377,6 @@ html[dir='ltr'] .search-box .search-icon {
 .pos-info-label { color: #9ca3af; font-size: 10px; }
 .pos-info-value { font-size: 16px; font-weight: 700; font-family: 'Segoe UI', sans-serif; white-space: nowrap; }
 .pos-info-value.fa-no { color: #fbbf24; font-size: 21px; letter-spacing: 1px; }
-.pos-info-value.date { font-size: 14px; direction: ltr; font-variant-numeric: tabular-nums; }
 .pos-display {
   flex: 1;
   display: flex; align-items: center; justify-content: center;
@@ -1420,6 +1413,7 @@ html[dir='ltr'] .search-box .search-icon {
 .pos-tool-btn:hover { transform: translateY(-1px); background: var(--card-bg); }
 .pos-tool-btn.cancel { background: linear-gradient(180deg, var(--danger-light), var(--danger)); color: #fff; border-color: var(--danger); }
 .pos-tool-btn.box { background: linear-gradient(180deg, var(--orange), var(--orange-deep)); color: #fff; border-color: var(--orange-deep); }
+.pos-tool-btn.customer { background: linear-gradient(180deg, var(--green), var(--green-deep)); color: #fff; border-color: var(--green-deep); }
 
 .pos-searchbar { display: flex; gap: 8px; padding: 8px 10px; background: var(--card-bg); border-bottom: 1px solid var(--border); }
 .pos-barcode-btn {
