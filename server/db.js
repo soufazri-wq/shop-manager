@@ -160,4 +160,9 @@ CREATE TABLE IF NOT EXISTS settings (
 );
 `);
 
+const userCols = db.prepare('PRAGMA table_info(users)').all().map((c) => c.name);
+if (!userCols.includes('pages')) {
+  db.exec('ALTER TABLE users ADD COLUMN pages TEXT');
+}
+
 export default db;

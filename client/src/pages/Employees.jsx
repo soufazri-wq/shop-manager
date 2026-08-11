@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { api } from '../api.js'
 import { useLang } from '../context/LangContext.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
 import Modal from '../components/Modal.jsx'
 import { EmptyState, Loader, ConfirmModal } from '../components/UI.jsx'
-import { getRolePages } from '../permissions.js'
+import { NAV, getRolePagePaths } from '../permissions.js'
 
 const ROLES = ['admin', 'manager', 'cashier', 'warehouse']
 
 export default function Employees() {
   const { t } = useLang()
+  const { user: me } = useAuth()
   const [users, setUsers] = useState(null)
   const [modal, setModal] = useState(null)
   const [deleting, setDeleting] = useState(null)
@@ -18,20 +20,33 @@ export default function Employees() {
   const load = () => api.get('/employees').then(setUsers).catch(() => setUsers([]))
   useEffect(load, [])
 
-  const openAdd = () => setModal({ name: '', email: '', phone: '', password: '', role: 'cashier' })
-  const openEdit = (u) => setModal({ id: u.id, name: u.name, email: u.email, phone: u.phone, role: u.role, active: u.active, password: '' })
+  const openAdd = () => setModal({ name: '', email: '', phone: '', password: '', role: 'cashier', active: 1, pages: getRolePagePaths('cashier') })
+  const openEdit = (u) => setModal({
+    id: u.id, name: u.name, email: u.email, phone: u.phone, role: u.role, active: u.active, password: '',
+    pages: u.pages && u.pages.length ? u.pages : getRolePagePaths(u.role),
+  })
+
+  const togglePage = (path) => {
+    const set = new Set(modal.pages)
+    if (set.has(path)) set.delete(path)
+    else set.add(path)
+    setModal({ ...modal, pages: NAV.map((n) => n.path).filter((p) => set.has(p)) })
+  }
 
   const save = async () => {
     if (!modal.name || !modal.email) { setError(t('required')); return }
     if (!modal.id && !modal.password) { setError(t('required')); return }
+    if (!modal.pages || modal.pages.length === 0) { setError(t('selectAtLeastOnePage')); return }
+    let pages = modal.pages
+    if (me && modal.id === me.id && !pages.includes('/employees')) pages = [...pages, '/employees']
     setSaving(true)
     try {
       if (modal.id) {
-        const body = { name: modal.name, email: modal.email, phone: modal.phone, role: modal.role, active: modal.active }
+        const body = { name: modal.name, email: modal.email, phone: modal.phone, role: modal.role, active: modal.active, pages }
         if (modal.password) body.password = modal.password
         await api.put('/employees/' + modal.id, body)
       } else {
-        await api.post('/employees', modal)
+        await api.post('/employees', { ...modal, pages })
       }
       setModal(null)
       load()
@@ -124,7 +139,7 @@ export default function Employees() {
           <div className="form-row">
             <div className="field">
               <label>{t('role')}</label>
-              <select value={modal.role} onChange={(e) => setModal({ ...modal, role: e.target.value })}>
+              <select value={modal.role} onChange={(e) => setModal({ ...modal, role: e.target.value, pages: getRolePagePaths(e.target.value) })}>
                 {ROLES.map((r) => <option key={r} value={r}>{t(r)}</option>)}
               </select>
             </div>
@@ -135,10 +150,17 @@ export default function Employees() {
           </div>
           <div className="field">
             <label>{t('rolePages')}</label>
-            <div className="role-pages">
-              {getRolePages(modal.role).map((p) => (
-                <span key={p.path} className="badge badge-blue">{p.icon} {t(p.key)}</span>
-              ))}
+            <div className="page-checks">
+              {NAV.map((p) => {
+                const locked = me && modal.id === me.id && p.path === '/employees'
+                const checked = locked || modal.pages.includes(p.path)
+                return (
+                  <label key={p.path} className={`page-check ${checked ? 'checked' : ''} ${locked ? 'locked' : ''}`}>
+                    <input type="checkbox" checked={checked} disabled={locked} onChange={() => togglePage(p.path)} />
+                    <span>{p.icon} {t(p.key)}</span>
+                  </label>
+                )
+              })}
             </div>
           </div>
           {modal.id && (

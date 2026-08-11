@@ -6,6 +6,15 @@ import { auth, JWT_SECRET } from '../middleware/auth.js';
 
 const router = express.Router();
 
+function parsePages(p) {
+  try {
+    const a = JSON.parse(p || '[]');
+    return Array.isArray(a) ? a : [];
+  } catch {
+    return [];
+  }
+}
+
 router.post('/login', (req, res) => {
   const { email, password } = req.body || {};
   if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
@@ -17,21 +26,22 @@ router.post('/login', (req, res) => {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 
+  const pages = parsePages(user.pages);
   const token = jwt.sign(
-    { id: user.id, name: user.name, email: user.email, role: user.role },
+    { id: user.id, name: user.name, email: user.email, role: user.role, pages },
     JWT_SECRET,
     { expiresIn: '7d' }
   );
   res.json({
     token,
-    user: { id: user.id, name: user.name, email: user.email, role: user.role, phone: user.phone },
+    user: { id: user.id, name: user.name, email: user.email, role: user.role, phone: user.phone, pages },
   });
 });
 
 router.get('/me', auth(), (req, res) => {
-  const user = db.prepare('SELECT id, name, email, phone, role, active FROM users WHERE id = ?').get(req.user.id);
+  const user = db.prepare('SELECT id, name, email, phone, role, pages, active FROM users WHERE id = ?').get(req.user.id);
   if (!user) return res.status(404).json({ error: 'User not found' });
-  res.json(user);
+  res.json({ ...user, pages: parsePages(user.pages) });
 });
 
 router.put('/me', auth(), (req, res) => {

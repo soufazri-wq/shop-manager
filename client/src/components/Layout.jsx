@@ -7,12 +7,17 @@ import { useSettings } from '../context/SettingsContext.jsx'
 import InstallButton from './InstallButton.jsx'
 import { NAV, ROLE_ACCESS } from '../permissions.js'
 
+function getAllowed(user) {
+  if (user && user.pages && user.pages.length) return user.pages
+  return ROLE_ACCESS[user?.role] || []
+}
+
 function Sidebar({ open, onClose }) {
   const { t } = useLang()
   const { user, logout } = useAuth()
   const { settings } = useSettings()
   const navigate = useNavigate()
-  const allowed = ROLE_ACCESS[user.role] || []
+  const allowed = getAllowed(user)
   const appName = settings.appName || t('appName')
 
   const handleLogout = () => {
@@ -94,16 +99,26 @@ function Topbar({ onMenu }) {
 }
 
 export default function Layout() {
+  const { t } = useLang()
+  const { user } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
   const isPos = location.pathname.startsWith('/pos')
+  const denied = !getAllowed(user).includes(location.pathname)
   return (
     <div className={`layout ${isPos ? 'pos-route' : ''}`}>
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="main">
         <Topbar onMenu={() => setSidebarOpen(true)} />
         <div className="content">
-          <Outlet />
+          {denied ? (
+            <div className="card access-denied">
+              <div className="access-denied-icon">🚫</div>
+              <h3>{t('noAccess')}</h3>
+            </div>
+          ) : (
+            <Outlet />
+          )}
         </div>
       </div>
     </div>

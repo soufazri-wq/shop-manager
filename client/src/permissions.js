@@ -23,3 +23,7 @@ export function getRolePages(role) {
   const allowed = ROLE_ACCESS[role] || []
   return NAV.filter((n) => allowed.includes(n.path))
 }
+
+export function getRolePagePaths(role) {
+  return getRolePages(role).map((n) => n.path)
+}

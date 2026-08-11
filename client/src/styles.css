@@ -691,6 +691,33 @@ html[dir='ltr'] .table th:last-child { border-top-right-radius: 12px; border-top
 }
 .role-pages .badge { font-weight: 700; }
 
+.page-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.page-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card-bg);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.15s;
+  user-select: none;
+}
+.page-check:hover { border-color: var(--primary); }
+.page-check.checked { background: var(--info-light); border-color: var(--primary); color: var(--primary-dark); }
+.page-check.locked { opacity: 0.6; cursor: not-allowed; }
+.page-check input { display: none; }
+
+.access-denied { text-align: center; padding: 60px 20px; }
+.access-denied-icon { font-size: 56px; margin-bottom: 12px; }
+
 /* ---------- Modal ---------- */
 .modal-overlay {
   position: fixed;
