@@ -15,7 +15,9 @@ import employeeRoutes from './routes/employees.js';
 import reportRoutes from './routes/reports.js';
 import licenseRoutes from './routes/license.js';
 import db from './db.js';
+import Database from 'better-sqlite3';
 import { checkLicense } from './license.js';
+import { auth } from './middleware/auth.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -79,6 +81,50 @@ app.use('/api', (req, res, next) => {
   const lic = checkLicense();
   if (!lic.valid) return res.status(402).json({ error: 'license_required', license: lic });
   next();
+});
+
+// ---------- نسخ احتياطي واسترجاع قاعدة البيانات (للمدير فقط) ----------
+app.get('/api/backup', auth('admin'), (req, res) => {
+  const tmp = path.join(os.tmpdir(), `shop-backup-${Date.now()}.db`);
+  db.backup(tmp)
+    .then(() => {
+      const fname = `shop-backup-${new Date().toISOString().slice(0, 10)}.db`;
+      res.setHeader('Content-Type', 'application/octet-stream');
+      res.setHeader('Content-Disposition', `attachment; filename="${fname}"`);
+      const stream = fs.createReadStream(tmp);
+      stream.on('close', () => fs.rmSync(tmp, { force: true }));
+      stream.on('error', () => fs.rmSync(tmp, { force: true }));
+      stream.pipe(res);
+    })
+    .catch((e) => res.status(500).json({ error: e.message }));
+});
+
+app.post('/api/backup/restore', auth('admin'), express.raw({ type: () => true, limit: '200mb' }), (req, res) => {
+  const buf = req.body;
+  if (!Buffer.isBuffer(buf) || buf.length < 100) {
+    return res.status(400).json({ error: 'Invalid database file' });
+  }
+  if (buf.slice(0, 15).toString('latin1') !== 'SQLite format 3') {
+    return res.status(400).json({ error: 'Not a SQLite database file' });
+  }
+  const tmp = path.join(os.tmpdir(), `shop-restore-${Date.now()}.db`);
+  try {
+    fs.writeFileSync(tmp, buf);
+    const check = new Database(tmp, { readonly: true });
+    const required = ['users', 'products', 'sales', 'purchases'];
+    const missing = required.filter((t) => !check.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name = ?").get(t));
+    check.close();
+    if (missing.length) return res.status(400).json({ error: 'Invalid database — missing tables: ' + missing.join(', ') });
+  } catch (e) {
+    fs.rmSync(tmp, { force: true });
+    return res.status(400).json({ error: 'Invalid database file: ' + e.message });
+  }
+  fs.rmSync(tmp, { force: true });
+  const target = path.join(__dirname, 'data.db.restore');
+  fs.writeFileSync(target, buf);
+  res.json({ ok: true });
+  console.log('[backup] استرجاع جاهز — إعادة تشغيل الخادم لتفعيله');
+  setTimeout(() => process.exit(0), 600);
 });
 
 app.use('/api/auth', authRoutes);

@@ -6,6 +6,14 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dbPath = path.join(__dirname, 'data.db');
 
+// استرجاع النسخة الاحتياطية عند بدء التشغيل (إن وُجدت)
+const restorePath = path.join(__dirname, 'data.db.restore');
+if (fs.existsSync(restorePath)) {
+  for (const f of [dbPath, dbPath + '-wal', dbPath + '-shm']) fs.rmSync(f, { force: true });
+  fs.renameSync(restorePath, dbPath);
+  console.log('[db] تم استرجاع قاعدة البيانات من النسخة الاحتياطية');
+}
+
 const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');

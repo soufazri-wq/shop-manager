@@ -16,6 +16,9 @@ export default function Settings() {
   const [msg, setMsg] = useState('')
   const [err, setErr] = useState('')
   const [saving, setSaving] = useState(false)
+  const [busyDb, setBusyDb] = useState(false)
+  const [dbMsg, setDbMsg] = useState('')
+  const [dbErr, setDbErr] = useState('')
 
   useEffect(() => {
     api.get('/auth/me').then((u) => setProfile({ name: u.name, phone: u.phone || '' })).catch(() => {})
@@ -78,6 +81,50 @@ export default function Settings() {
       setPass({ currentPassword: '', password: '', confirm: '' })
     } catch (e) { setErr(e.message) }
     finally { setSaving(false) }
+  }
+
+  const backupDb = async () => {
+    setDbErr(''); setDbMsg('')
+    setBusyDb(true)
+    try {
+      const token = localStorage.getItem('token') || ''
+      const res = await fetch('/api/backup', { headers: { Authorization: 'Bearer ' + token } })
+      if (!res.ok) {
+        let d; try { d = await res.json() } catch (e) {}
+        throw new Error((d && d.error) || 'Failed')
+      }
+      const blob = await res.blob()
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(blob)
+      a.download = `shop-backup-${new Date().toISOString().slice(0, 10)}.db`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(a.href)
+      setDbMsg(t('backupSuccess'))
+    } catch (e) { setDbErr(e.message) }
+    finally { setBusyDb(false) }
+  }
+
+  const restoreDb = async (e) => {
+    const file = e.target.files && e.target.files[0]
+    e.target.value = ''
+    if (!file) return
+    if (!window.confirm(t('restoreConfirm'))) return
+    setDbErr(''); setDbMsg('')
+    setBusyDb(true)
+    try {
+      const token = localStorage.getItem('token') || ''
+      const res = await fetch('/api/backup/restore', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/octet-stream' },
+        body: file,
+      })
+      let d; try { d = await res.json() } catch (e) {}
+      if (!res.ok) throw new Error((d && d.error) || 'Failed')
+      setDbMsg(t('restoreSuccess'))
+    } catch (err) { setDbErr(err.message) }
+    finally { setBusyDb(false) }
   }
 
   return (
@@ -147,6 +194,23 @@ export default function Settings() {
         <div className="text-muted" style={{ fontSize: 13, lineHeight: 1.8 }}>
           {t('networkAddressHint')}
         </div>
+      </div>
+
+      <div className="card card-pad">
+        <h3 className="font-bold mb-16">🗄️ {t('database')}</h3>
+        <div className="text-muted" style={{ fontSize: 13, lineHeight: 1.8, marginBottom: 14 }}>
+          {t('databaseHint')}
+        </div>
+        <button className="btn" onClick={backupDb} disabled={busyDb}>
+          {busyDb ? t('loading') : '💾 ' + t('backupDatabase')}
+        </button>
+        <div style={{ height: 10 }} />
+        <label className="btn btn-ghost" style={{ display: 'block', textAlign: 'center', cursor: 'pointer' }}>
+          📤 {t('restoreDatabase')}
+          <input type="file" accept=".db,.sqlite" style={{ display: 'none' }} onChange={restoreDb} />
+        </label>
+        {dbMsg && <div className="form-success">{dbMsg}</div>}
+        {dbErr && <div className="form-error">{dbErr}</div>}
       </div>
     </div>
   )
