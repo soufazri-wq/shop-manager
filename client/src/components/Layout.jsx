@@ -5,27 +5,7 @@ import { useLang } from '../context/LangContext.jsx'
 import { useTheme } from '../context/ThemeContext.jsx'
 import { useSettings } from '../context/SettingsContext.jsx'
 import InstallButton from './InstallButton.jsx'
-
-const NAV = [
-  { path: '/', key: 'dashboard', icon: '📊' },
-  { path: '/pos', key: 'pos', icon: '🛒' },
-  { path: '/sales', key: 'sales', icon: '🧾' },
-  { path: '/products', key: 'products', icon: '📦' },
-  { path: '/inventory', key: 'inventory', icon: '🏬' },
-  { path: '/purchases', key: 'purchases', icon: '🚚' },
-  { path: '/suppliers', key: 'suppliers', icon: '🏭' },
-  { path: '/customers', key: 'customers', icon: '👥' },
-  { path: '/employees', key: 'employees', icon: '🛡️' },
-  { path: '/reports', key: 'reports', icon: '📈' },
-  { path: '/settings', key: 'settings', icon: '⚙️' },
-]
-
-const ROLE_ACCESS = {
-  admin: NAV.map((n) => n.path),
-  manager: NAV.map((n) => n.path),
-  cashier: ['/', '/pos', '/sales', '/customers', '/settings'],
-  warehouse: ['/', '/products', '/inventory', '/settings'],
-}
+import { NAV, ROLE_ACCESS } from '../permissions.js'
 
 function Sidebar({ open, onClose }) {
   const { t } = useLang()

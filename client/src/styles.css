@@ -679,6 +679,18 @@ html[dir='ltr'] .table th:last-child { border-top-right-radius: 12px; border-top
 .badge-adjust { background: var(--info-light); color: var(--royal-deep); }
 .badge-purple { background: #ede9fe; color: #7c3aed; }
 
+.role-pages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-soft);
+  min-height: 20px;
+}
+.role-pages .badge { font-weight: 700; }
+
 /* ---------- Modal ---------- */
 .modal-overlay {
   position: fixed;

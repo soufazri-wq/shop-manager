@@ -3,6 +3,7 @@ import { api } from '../api.js'
 import { useLang } from '../context/LangContext.jsx'
 import Modal from '../components/Modal.jsx'
 import { EmptyState, Loader, ConfirmModal } from '../components/UI.jsx'
+import { getRolePages } from '../permissions.js'
 
 const ROLES = ['admin', 'manager', 'cashier', 'warehouse']
 
@@ -130,6 +131,14 @@ export default function Employees() {
             <div className="field">
               <label>{modal.id ? t('newPassword') : t('password')} {modal.id ? '' : '*'}</label>
               <input type="password" value={modal.password} onChange={(e) => setModal({ ...modal, password: e.target.value })} />
+            </div>
+          </div>
+          <div className="field">
+            <label>{t('rolePages')}</label>
+            <div className="role-pages">
+              {getRolePages(modal.role).map((p) => (
+                <span key={p.path} className="badge badge-blue">{p.icon} {t(p.key)}</span>
+              ))}
             </div>
           </div>
           {modal.id && (
