@@ -1344,8 +1344,8 @@ html[dir='ltr'] .search-box .search-icon {
 .pos-title { font-weight: 800; font-size: 16px; letter-spacing: 0.5px; font-family: 'Segoe UI', sans-serif; }
 .pos-title-controls { display: flex; gap: 6px; }
 .pos-tc {
-  width: 32px; height: 26px; border: none; border-radius: 6px;
-  background: rgba(255, 255, 255, 0.16); color: #fff; cursor: pointer; font-size: 13px; line-height: 1;
+  width: 38px; height: 30px; border: none; border-radius: 6px;
+  background: rgba(255, 255, 255, 0.16); color: #fff; cursor: pointer; font-size: 17px; line-height: 1;
 }
 .pos-tc:hover { background: rgba(255, 255, 255, 0.32); }
 .pos-tc.close:hover { background: #dc2626; }
@@ -1371,8 +1371,8 @@ html[dir='ltr'] .search-box .search-icon {
 }
 .pos-infobuttons { display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 8px 6px; background: #0b0b0f; }
 .pos-infobtn {
-  width: 34px; height: 24px; background: #1f2937; border: 1px solid #374151;
-  border-radius: 6px; color: #fff; cursor: pointer; font-size: 13px; line-height: 1;
+  width: 42px; height: 30px; background: #1f2937; border: 1px solid #374151;
+  border-radius: 6px; color: #fff; cursor: pointer; font-size: 19px; line-height: 1;
 }
 .pos-infobtn:hover { background: #374151; }
 .pos-sale-info {
@@ -1411,10 +1411,10 @@ html[dir='ltr'] .search-box .search-icon {
   background: var(--card-bg); border-bottom: 1px solid var(--border); flex-wrap: wrap;
 }
 .pos-tool-btn {
-  width: 40px; height: 40px; border-radius: 8px;
+  width: 48px; height: 46px; border-radius: 8px;
   border: 1px solid var(--border);
   background: linear-gradient(180deg, var(--bg-soft), var(--border));
-  color: var(--text); font-weight: 700; font-size: 14px; cursor: pointer;
+  color: var(--text); font-weight: 700; font-size: 22px; cursor: pointer;
   box-shadow: var(--shadow-sm);
 }
 .pos-tool-btn:hover { transform: translateY(-1px); background: var(--card-bg); }
@@ -1423,8 +1423,8 @@ html[dir='ltr'] .search-box .search-icon {
 
 .pos-searchbar { display: flex; gap: 8px; padding: 8px 10px; background: var(--card-bg); border-bottom: 1px solid var(--border); }
 .pos-barcode-btn {
-  width: 44px; height: 40px; border-radius: 8px; border: 1px solid var(--border);
-  background: linear-gradient(180deg, var(--info-light), var(--primary-light)); color: var(--primary-dark); font-size: 20px; cursor: pointer;
+  width: 52px; height: 46px; border-radius: 8px; border: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--info-light), var(--primary-light)); color: var(--primary-dark); font-size: 26px; cursor: pointer;
 }
 .pos-search-wrap { position: relative; flex: 1; min-width: 0; }
 .pos-search-input {
@@ -1460,7 +1460,7 @@ html[dir='ltr'] .search-box .search-icon {
   padding: 10px 12px; text-align: start; white-space: nowrap;
   border-bottom: 2px solid var(--primary-dark);
 }
-.th-search-icon { margin-inline-end: 6px; opacity: 0.85; }
+.th-search-icon { margin-inline-end: 6px; opacity: 0.85; font-size: 16px; }
 .th-qty { text-align: center !important; }
 .th-prix, .th-montant { text-align: end !important; }
 .pos-table tbody td { padding: 7px 12px; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text); }
@@ -1470,12 +1470,12 @@ html[dir='ltr'] .search-box .search-icon {
 .td-name { font-weight: 600; }
 .td-qty { width: 150px; }
 .pos-qtyctl { display: flex; align-items: center; gap: 4px; }
-.pos-qtyctl button { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--text); cursor: pointer; font-weight: 700; }
+.pos-qtyctl button { width: 34px; height: 34px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--text); cursor: pointer; font-weight: 700; font-size: 18px; }
 .pos-qtyctl button:hover { background: var(--primary-light); }
-.pos-qty-input { width: 48px; height: 28px; text-align: center; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; background: var(--card-bg); color: var(--text); }
+.pos-qty-input { width: 52px; height: 34px; text-align: center; border: 1px solid var(--border); border-radius: 6px; font-size: 15px; background: var(--card-bg); color: var(--text); }
 .td-prix { color: var(--text); text-align: end; white-space: nowrap; }
 .td-montant { font-weight: 800; color: var(--success); text-align: end; white-space: nowrap; }
-.pos-row-del { border: none; background: none; cursor: pointer; margin-inline-start: 10px; opacity: 0.55; font-size: 13px; }
+.pos-row-del { border: none; background: none; cursor: pointer; margin-inline-start: 10px; opacity: 0.55; font-size: 20px; }
 .pos-row-del:hover { opacity: 1; }
 .pos-empty-row td { text-align: center; padding: 36px 12px; }
 .pos-empty { color: var(--text-muted); }
@@ -1498,17 +1498,17 @@ html[dir='ltr'] .search-box .search-icon {
 .pos-discount-box label { font-size: 12px; color: var(--text-muted); }
 .pos-discount-box input { width: 70px; height: 30px; border: 1px solid var(--border); border-radius: 6px; padding: 0 8px; background: var(--card-bg); color: var(--text); }
 .pos-save {
-  height: 50px; border-radius: 10px; border: none; cursor: pointer;
+  height: 54px; border-radius: 10px; border: none; cursor: pointer;
   background: linear-gradient(180deg, var(--green), var(--green-deep));
-  color: #fff; font-size: 16px; font-weight: 800;
+  color: #fff; font-size: 18px; font-weight: 800;
   display: flex; align-items: center; justify-content: center; gap: 10px;
   box-shadow: 0 3px 8px rgba(22, 163, 74, 0.35);
 }
 .pos-save:hover { filter: brightness(1.1); }
 .pos-save-print {
-  height: 50px; border-radius: 10px; border: none; cursor: pointer;
+  height: 54px; border-radius: 10px; border: none; cursor: pointer;
   background: linear-gradient(180deg, var(--primary), var(--primary-dark));
-  color: #fff; font-size: 16px; font-weight: 800;
+  color: #fff; font-size: 18px; font-weight: 800;
   display: flex; align-items: center; justify-content: center; gap: 10px;
   box-shadow: 0 3px 8px rgba(37, 99, 235, 0.35);
 }

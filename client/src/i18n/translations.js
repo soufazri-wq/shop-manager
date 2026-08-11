@@ -28,6 +28,12 @@ export const translations = {
     activate: 'تفعيل',
     licenseInvalid: 'مفتاح غير صالح لهذا الجهاز',
     days: 'يوم',
+    // POS table columns
+    posColId: 'رقم المنتج',
+    posColName: 'المنتج',
+    posColQty: 'الكمية',
+    posColPrice: 'السعر',
+    posColAmount: 'الإجمالي',
     // Common
     search: 'بحث...',
     items: 'المنتجات',
@@ -231,6 +237,12 @@ export const translations = {
     activate: 'Activate',
     licenseInvalid: 'Invalid key for this device',
     days: 'days',
+    // POS table columns
+    posColId: 'Product ID',
+    posColName: 'Product',
+    posColQty: 'Qty',
+    posColPrice: 'Unit Price',
+    posColAmount: 'Amount',
     // Common
     search: 'Search...',
     items: 'Items',

@@ -385,11 +385,11 @@ export default function POS() {
                 <table className="pos-table">
                   <thead>
                     <tr>
-                      <th className="th-id"><span className="th-search-icon">🔍</span> IDProduit</th>
-                      <th>Désignation</th>
-                      <th className="th-qty">Qté</th>
-                      <th className="th-prix">Prix (U)</th>
-                      <th className="th-montant">Montant</th>
+                      <th className="th-id"><span className="th-search-icon">🔍</span> {t('posColId')}</th>
+                      <th>{t('posColName')}</th>
+                      <th className="th-qty">{t('posColQty')}</th>
+                      <th className="th-prix">{t('posColPrice')}</th>
+                      <th className="th-montant">{t('posColAmount')}</th>
                     </tr>
                   </thead>
                   <tbody>
