@@ -4,5 +4,6 @@ dist/
 server/data.db
 server/data.db-shm
 server/data.db-wal
+seller_private.pem
 .DS_Store
 .vscode/

@@ -1,9 +1,11 @@
 import crypto from 'crypto';
 import db from './db.js';
 
-export const LICENSE_ENABLED = String(process.env.LICENSE_ENABLED ?? '1') !== '0';
-export const MASTER_KEY = process.env.LICENSE_MASTER_KEY || 'shop-master-2026';
-export const TRIAL_DAYS = Math.max(1, parseInt(process.env.TRIAL_DAYS || '14', 10));
+const TRIAL_DAYS = Math.max(1, parseInt(process.env.TRIAL_DAYS || '14', 10));
+
+export const PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
+MCowBQYDK2VwAyEACKFabnj16kI5I0m9Z7qY0hc6PBRBT9ZiQBzUJ3LKxhQ=
+-----END PUBLIC KEY-----`;
 
 const ALPH = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 const CHARS = {};
@@ -72,67 +74,54 @@ export function ensureInstall() {
   return { id, at };
 }
 
-export function buildKey(installId, days) {
-  const expiry = addDaysStr(todayStr(), days);
-  const payload = `${installId}|${expiry}`;
-  const sig = crypto.createHmac('sha256', MASTER_KEY).update(payload).digest('hex').slice(0, 12);
-  return base32encode(Buffer.from(`${payload}|${sig}`, 'utf8'));
-}
-
-export function validateKey(key, installId) {
+function verifyLicenseKey(key, installId) {
   let decoded;
   try {
-    decoded = base32decode(key).toString('utf8');
+    decoded = base32decode(key);
   } catch {
     return { ok: false, reason: 'format' };
   }
-  const parts = decoded.split('|');
-  if (parts.length !== 3) return { ok: false, reason: 'format' };
-  const [id, exp, sig] = parts;
+  if (decoded.length <= 64) return { ok: false, reason: 'format' };
+  const payload = decoded.subarray(0, decoded.length - 64);
+  const sig = decoded.subarray(decoded.length - 64);
+  const text = payload.toString('utf8');
+  const parts = text.split('|');
+  if (parts.length !== 2) return { ok: false, reason: 'format' };
+  const [id, exp] = parts;
   if (id !== installId) return { ok: false, reason: 'install' };
-  const expect = crypto.createHmac('sha256', MASTER_KEY).update(`${id}|${exp}`).digest('hex').slice(0, 12);
-  const a = Buffer.from(sig);
-  const b = Buffer.from(expect);
-  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return { ok: false, reason: 'signature' };
+  try {
+    const ok = crypto.verify(null, payload, { key: PUBLIC_KEY, format: 'pem', type: 'spki' }, sig);
+    if (!ok) return { ok: false, reason: 'signature' };
+  } catch {
+    return { ok: false, reason: 'signature' };
+  }
   if (exp < todayStr()) return { ok: false, reason: 'expired' };
   return { ok: true, expiry: exp };
 }
 
 export function checkLicense() {
-  if (!LICENSE_ENABLED) {
-    return { enabled: false, valid: true, activated: false, trial: false };
-  }
   const { id, at } = ensureInstall();
   const stored = getSetting('activation_key');
   if (stored) {
-    const v = validateKey(stored, id);
+    const v = verifyLicenseKey(stored, id);
     if (v.ok) {
-      return { enabled: true, valid: true, activated: true, trial: false, installId: id, expiry: v.expiry, message: 'activated' };
+      return { valid: true, activated: true, trial: false, installId: id, expiry: v.expiry, message: 'activated' };
     }
   }
   const trialEnds = addDaysStr(at, TRIAL_DAYS);
   const valid = todayStr() <= trialEnds;
   const daysLeft = Math.max(0, Math.floor((new Date(trialEnds + 'T00:00:00Z') - new Date()) / 86400000) + 1);
   return {
-    enabled: true, valid, activated: false, trial: true,
+    valid, activated: false, trial: true,
     installId: id, installedAt: at, trialEnds, daysLeft,
     message: valid ? 'trial' : 'expired',
   };
 }
 
 export function activate(key) {
-  if (!LICENSE_ENABLED) return { ok: true, reason: 'disabled' };
   const { id } = ensureInstall();
-  const v = validateKey(key, id);
+  const v = verifyLicenseKey(key, id);
   if (!v.ok) return { ok: false, reason: v.reason };
   setSetting('activation_key', String(key).trim());
   return { ok: true, expiry: v.expiry };
-}
-
-export function generateKey(installId, days, master) {
-  if (master !== MASTER_KEY) return { ok: false, reason: 'master' };
-  if (!/^SHOP-[0-9A-F]{10}$/i.test(String(installId).trim())) return { ok: false, reason: 'install' };
-  const n = parseInt(days, 10);
-  if (!Number.isFinite(n) || n < 1 || n > 3650) return { ok: false, reason: 'days' };
-  return { ok: true, key: buildKey(String(installId).trim(), n), expiry: addDaysStr(todayStr(), n) };
 }
