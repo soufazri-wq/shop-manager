@@ -67,14 +67,17 @@ export default function LicenseScreen({ onUnlock }) {
             {info.activated && (
               <p className="license-activated">✅ {t('licenseActivated')} — {t('licenseUntil')} <b dir="ltr">{info.expiry}</b></p>
             )}
-            {!info.activated && info.valid && (
+            {info.revoked && (
+              <p className="license-expired">🚫 {t('licenseRevoked')}</p>
+            )}
+            {!info.activated && !info.revoked && info.valid && (
               <p className="license-trial">⏳ {t('trialActive')}: <b>{info.daysLeft}</b> {t('days')}</p>
             )}
-            {!info.activated && !info.valid && (
+            {!info.activated && !info.revoked && !info.valid && (
               <p className="license-expired">⚠️ {t('trialExpired')}</p>
             )}
 
-            {!info.activated && (
+            {!info.activated && !info.revoked && (
               <>
                 <div className="field">
                   <label>{t('installId')}</label>

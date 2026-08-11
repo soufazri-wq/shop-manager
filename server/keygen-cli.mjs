@@ -42,6 +42,7 @@ const usage = () => {
   console.log('');
   console.log('  الاستخدام:');
   console.log('    node keygen-cli.mjs <installId> <days>');
+  console.log('    node keygen-cli.mjs <installId> lifetime   (مدى الحياة)');
   console.log('');
   console.log('  المفتاح الخاص يُقرأ من (أي واحد):');
   console.log('    - متغير البيئة  LICENSE_PRIVATE_KEY');
@@ -49,7 +50,7 @@ const usage = () => {
   console.log('');
   console.log('  أمثلة:');
   console.log('    node keygen-cli.mjs SHOP-85C6571D13 365');
-  console.log('    node keygen-cli.mjs SHOP-85C6571D13 30');
+  console.log('    node keygen-cli.mjs SHOP-85C6571D13 lifetime');
   process.exit(1);
 };
 
@@ -59,9 +60,10 @@ if (!/^SHOP-[0-9A-F]{10}$/i.test(installId)) {
   console.log('خطأ: رقم التثبيت غير صالح — يجب أن يكون بصيغة SHOP-XXXXXXXXXX');
   process.exit(1);
 }
+const lifetime = daysStr === 'lifetime';
 const days = parseInt(daysStr, 10);
-if (!Number.isFinite(days) || days < 1 || days > 3650) {
-  console.log('خطأ: عدد الأيام يجب أن يكون بين 1 و 3650');
+if (!lifetime && (!Number.isFinite(days) || days < 1 || days > 3650)) {
+  console.log('خطأ: عدد الأيام يجب أن يكون بين 1 و 3650 (أو استخدم lifetime لمدى الحياة)');
   process.exit(1);
 }
 
@@ -71,14 +73,15 @@ if (!privateKey) {
   process.exit(1);
 }
 
-const expiry = addDaysStr(todayStr(), days);
+const LIFETIME_DATE = '2099-12-31';
+const expiry = lifetime ? LIFETIME_DATE : addDaysStr(todayStr(), days);
 const payload = Buffer.from(`${installId}|${expiry}`, 'utf8');
 const sig = crypto.sign(null, payload, privateKey);
 const key = base32encode(Buffer.concat([payload, sig]));
 
 console.log('');
 console.log('Install ID :', installId);
-console.log('Valid until:', expiry);
+console.log('Valid until:', lifetime ? 'مدى الحياة (2099-12-31)' : expiry);
 console.log('KEY        :', key);
 console.log('');
 console.log('أرسل هذا المفتاح للعميل ليضعه في شاشة التفعيل.');

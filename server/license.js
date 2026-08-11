@@ -60,6 +60,55 @@ function addDaysStr(base, days) {
   return d.toISOString().slice(0, 10);
 }
 
+// ---------- الإيقاف (Revocation) ----------
+// 1) LICENSE_REVOKED=1  : إيقاف فوري (للمستضافين عندك: Render…)
+// 2) LICENSE_REVOKE_URL : قائمة إيقاف موقّعة تُجلب من الخادم (للمستضافين بأنفسهم)
+const REVOKED_ENV = process.env.LICENSE_REVOKED === '1';
+const REVOKE_URL = process.env.LICENSE_REVOKE_URL || '';
+const REVOKE_REFRESH_MS = Math.max(30000, parseInt(process.env.LICENSE_REVOKE_REFRESH_MS || '300000', 10));
+const REVOKED = new Set();
+
+function verifyRevokeList(list, sigHex) {
+  if (!Array.isArray(list)) return false;
+  const sorted = list.map((x) => String(x).trim()).filter(Boolean).sort();
+  const payload = Buffer.from(`REVOKE|${sorted.length}|${sorted.join(',')}`, 'utf8');
+  const sig = Buffer.from(String(sigHex || ''), 'hex');
+  if (!sig.length) return false;
+  try {
+    return crypto.verify(null, payload, { key: PUBLIC_KEY, format: 'pem', type: 'spki' }, sig);
+  } catch {
+    return false;
+  }
+}
+
+async function refreshRevokeList() {
+  if (!REVOKE_URL) return;
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 4000);
+    const r = await fetch(REVOKE_URL, { signal: ctrl.signal });
+    clearTimeout(timer);
+    if (!r.ok) return;
+    const j = await r.json();
+    if (verifyRevokeList(j.list, j.sig)) {
+      REVOKED.clear();
+      for (const id of j.list) REVOKED.add(String(id).trim());
+      console.log(`[license] قائمة الإيقاف محدّثة: ${REVOKED.size} معرّف`);
+    }
+  } catch {
+    /* offline-first: نبقي آخر قائمة صحيحة */
+  }
+}
+
+if (REVOKE_URL) {
+  refreshRevokeList();
+  setInterval(refreshRevokeList, REVOKE_REFRESH_MS);
+}
+
+function isRevoked(installId) {
+  return REVOKED_ENV || REVOKED.has(installId);
+}
+
 export function ensureInstall() {
   let id = getSetting('install_id');
   if (!id) {
@@ -101,6 +150,9 @@ function verifyLicenseKey(key, installId) {
 
 export function checkLicense() {
   const { id, at } = ensureInstall();
+  if (isRevoked(id)) {
+    return { valid: false, activated: false, trial: false, installId: id, message: 'revoked', revoked: true };
+  }
   const stored = getSetting('activation_key');
   if (stored) {
     const v = verifyLicenseKey(stored, id);
@@ -120,6 +172,7 @@ export function checkLicense() {
 
 export function activate(key) {
   const { id } = ensureInstall();
+  if (isRevoked(id)) return { ok: false, reason: 'revoked' };
   const v = verifyLicenseKey(key, id);
   if (!v.ok) return { ok: false, reason: v.reason };
   setSetting('activation_key', String(key).trim());

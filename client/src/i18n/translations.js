@@ -27,6 +27,7 @@ export const translations = {
     activationKey: 'مفتاح التفعيل',
     activate: 'تفعيل',
     licenseInvalid: 'مفتاح غير صالح لهذا الجهاز',
+    licenseRevoked: 'تم إيقاف ترخيص هذا الجهاز من قبل المزوّد. تواصل مع المزوّد لمعرفة التفاصيل.',
     days: 'يوم',
     // POS table columns
     posColBarcode: 'الباركود',
@@ -236,6 +237,7 @@ export const translations = {
     activationKey: 'License Key',
     activate: 'Activate',
     licenseInvalid: 'Invalid key for this device',
+    licenseRevoked: 'This installation has been revoked by the provider. Contact your provider for details.',
     days: 'days',
     // POS table columns
     posColBarcode: 'Barcode',
