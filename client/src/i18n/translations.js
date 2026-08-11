@@ -29,7 +29,7 @@ export const translations = {
     licenseInvalid: 'مفتاح غير صالح لهذا الجهاز',
     days: 'يوم',
     // POS table columns
-    posColId: 'رقم المنتج',
+    posColBarcode: 'الباركود',
     posColName: 'المنتج',
     posColQty: 'الكمية',
     posColPrice: 'السعر',
@@ -238,7 +238,7 @@ export const translations = {
     licenseInvalid: 'Invalid key for this device',
     days: 'days',
     // POS table columns
-    posColId: 'Product ID',
+    posColBarcode: 'Barcode',
     posColName: 'Product',
     posColQty: 'Qty',
     posColPrice: 'Unit Price',

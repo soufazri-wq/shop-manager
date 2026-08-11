@@ -375,7 +375,7 @@ export default function POS() {
                 <table className="pos-table">
                   <thead>
                     <tr>
-                      <th className="th-id"><span className="th-search-icon">🔍</span> {t('posColId')}</th>
+                      <th className="th-id"><span className="th-search-icon">🔍</span> {t('posColBarcode')}</th>
                       <th>{t('posColName')}</th>
                       <th className="th-qty">{t('posColQty')}</th>
                       <th className="th-prix">{t('posColPrice')}</th>
@@ -395,7 +395,7 @@ export default function POS() {
                     )}
                     {items.map((i) => (
                       <tr key={i.id} className={`pos-row ${selectedId === i.id ? 'selected' : ''}`} onClick={() => setSelectedId(i.id)}>
-                        <td className="td-id">{i.sku || i.id}</td>
+                        <td className="td-id">{i.barcode || i.sku || i.id}</td>
                         <td className="td-name">{i.name}</td>
                         <td className="td-qty">
                           <div className="pos-qtyctl">
